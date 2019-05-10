@@ -1,0 +1,24 @@
+PROG     START   9FFF
+
+         LDX     #0
+         LDT     #4
+         LDS     #1
+         LDA     #0
+LOOP     LDCH    STR,X
+         COMP    TARGET
+         JEQ     FOUND
+         ADDR    S,X
+         COMPR   X,T
+         JLT     LOOP
+         J       NOT
+FOUND    LDA     #STR
+         ADDR    X,A
+         J       DONE
+NOT      LDA     TEST
+DONE     J       *
+STR      BYTE    C'textfile'
+TARGET   BYTE    X'000078'
+TEST     BYTE    X'FFFFFF'
+TEST2    RESW    3
+TEST2    RESB    1
+         END
