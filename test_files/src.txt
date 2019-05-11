@@ -1,5 +1,4 @@
-PROG     START   9FFF
-
+PROG     START   0000
          LDX     #0
          LDT     #4
          LDS     #1

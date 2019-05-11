@@ -35,6 +35,8 @@ public class Cache {
         optable.put("STA", new Operation("STA",0x0C, 3, new OPR[]{OPR.VAL, OPR.NONE}));
         optable.put("+STA", new Operation("+STA",0x0C, 4, new OPR[]{OPR.VAL, OPR.NONE}));
         optable.put("STX", new Operation("STX",0x10, 3, new OPR[]{OPR.VAL, OPR.NONE}));
+        optable.put("STL", new Operation("STL",0x14, 3, new OPR[]{OPR.VAL, OPR.NONE}));
+        optable.put("+STL", new Operation("+STL",0x14, 3, new OPR[]{OPR.VAL, OPR.NONE}));
         optable.put("+STX", new Operation("+STX",0x10, 4, new OPR[]{OPR.VAL, OPR.NONE}));
         optable.put("STT", new Operation("STT",0x84, 3, new OPR[]{OPR.VAL, OPR.NONE}));
         optable.put("+STT", new Operation("+STT",0x84, 4, new OPR[]{OPR.VAL, OPR.NONE}));

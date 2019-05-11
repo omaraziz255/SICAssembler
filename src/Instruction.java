@@ -21,7 +21,7 @@ public class Instruction {
         this.error = null;
     }
 
-    public Instruction(String comment){
+    public Instruction(String comment) {
         this.label = null;
         this.mnemonic = null;
         this.operands = null;

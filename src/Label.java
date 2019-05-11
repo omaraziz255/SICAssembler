@@ -7,7 +7,7 @@ public class Label {
         this.address = address;
     }
 
-    public Label(String name){
+    public Label(String name) {
         this.name = name;
         this.address = null;
     }
@@ -27,7 +27,6 @@ public class Label {
     public void setAddress(String address) {
         this.address = address;
     }
-
 
 
 }
