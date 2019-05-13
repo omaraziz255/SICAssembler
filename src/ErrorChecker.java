@@ -27,7 +27,7 @@ public class ErrorChecker {
     }
 
     public static Instruction checkOpError(Instruction i){
-        if(Cache.optable.containsKey(i.getMnemonic().substring(1))) {
+        if(!Cache.optable.containsKey(i.getMnemonic().substring(1)) && i.getMnemonic().startsWith("*")) {
             i.setError("Error: Instruction is not valid for Format 4");
             return i;
         }

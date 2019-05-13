@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class ObjectFile {
     private StringBuilder header;
@@ -154,6 +155,8 @@ public class ObjectFile {
         String objectCode = (extend(Long.toBinaryString(opcode), 8)).substring(0, 6);
         String[] ops = i.getOperands();
         String address;
+        if(isTerminator(ops))
+            ops[0] = ops[0].replace("*", String.valueOf(PC));
         if (isIndirect(ops)) {
             objectCode += "10";
             ops[0] = ops[0].replace("@", "");
@@ -167,6 +170,9 @@ public class ObjectFile {
         else
             objectCode += "0";
         objectCode += "001";
+
+        if(isSimpleExpression(ops))
+            ops[0] = String.valueOf(calculateOP(ops[0]));
         if(isNumber(ops[0]))
             address = Integer.toHexString(Integer.parseInt(ops[0]));
         else
@@ -186,7 +192,7 @@ public class ObjectFile {
         String[] ops = i.getOperands();
         int disp;
         if(isTerminator(ops))
-            ops[0] = String.valueOf(PC);
+            ops[0] = ops[0].replace("*", String.valueOf(PC));
         if (isIndirect(ops)) {
             objectCode += "10";
             ops[0] = ops[0].replace("@", "");
@@ -199,6 +205,8 @@ public class ObjectFile {
             objectCode += "1";
         else
             objectCode += "0";
+        if(isSimpleExpression(ops))
+            ops[0] = String.valueOf(calculateOP(ops[0]));
         if (isNumber(ops[0])){
             disp = Integer.parseInt(ops[0]);
             objectCode += "000";
@@ -212,8 +220,10 @@ public class ObjectFile {
                 disp = TA - Base;
                 if (isBase(disp))
                     objectCode += "100";
-                else
+                else{
+                    disp = TA;
                     objectCode += "000";
+                }
             }
         }
         objectCode += extend(Integer.toBinaryString(disp), 12);
@@ -233,8 +243,60 @@ public class ObjectFile {
         return n;
     }
 
+    public int calculateOP(String op){
+        String x = findOperation(op);
+        int a, b;
+        StringTokenizer tokenizer = new StringTokenizer(op, x);
+        String op1 = tokenizer.nextToken();
+        String op2 = tokenizer.nextToken();
+        b = Integer.parseInt(op2);
+        if(isNumber(op1))
+            a = Integer.parseInt(op1);
+        else {
+            int TA = Integer.parseInt(Cache.symtable.get(op1).getAddress(), 16);
+            a = TA - PC;
+            if(!isPCRelative(a)){
+                a = TA-Base;
+                if(!isBase(a))
+                    a = TA;
+            }
+
+        }
+        return simpleCalc(a,b,x);
+    }
+
+    public String findOperation(String op){
+        if(op.contains("+"))
+            return "+";
+        else if(op.contains("-"))
+            return "-";
+        else if(op.contains("*"))
+            return "*";
+        else
+            return "/";
+    }
+
+    public int simpleCalc(int x, int y, String op){
+        switch(op){
+            case "+":
+                return x + y;
+            case "-":
+                return x - y;
+            case "*":
+                return x * y;
+            default:
+                return x / y;
+        }
+    }
+
     public boolean isTerminator(String[] ops){
-        if(ops[0].equals("*"))
+        if(ops[0].startsWith("*"))
+            return true;
+        return false;
+    }
+
+    public boolean isSimpleExpression(String[] ops){
+        if(ops[0].contains("+") || ops[0].contains("-") || ops[0].contains("/") || ops[0].contains("*"))
             return true;
         return false;
     }

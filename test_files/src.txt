@@ -14,7 +14,7 @@ FOUND    LDA     #STR
          ADDR    X,A
          J       DONE
 NOT      LDA     TEST
-DONE     J       *
+DONE     +J      *
 STR      BYTE    C'textfile'
 TARGET   BYTE    X'000078'
 TEST     BYTE    X'FFFFFF'
