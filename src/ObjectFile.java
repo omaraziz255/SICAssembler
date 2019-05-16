@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -53,7 +55,7 @@ public class ObjectFile {
     public void generateEndRecord() {
         int i;
         for (i = 0; i < code.size(); i++) {
-            if (code.get(i).getMnemonic().equals("START"))
+            if (code.get(i).getMnemonic().equals("START") || code.get(i).getMnemonic().equals("ORG"))
                 break;
         }
         end.append("^" + addresses.get(i));
@@ -64,7 +66,7 @@ public class ObjectFile {
         this.code = Assembler.getInstance().getParser().getCode();
         this.addresses = Assembler.getInstance().getParser().getLC().getAddresses();
         for (i = 0; i < code.size(); i++) {
-            if (code.get(i).getMnemonic().equals("START"))
+            if (code.get(i).getMnemonic().equals("START") || code.get(i).getMnemonic().equals("ORG"))
                 break;
         }
         String progName = code.get(i).getLabel().getName();
@@ -78,29 +80,40 @@ public class ObjectFile {
 
     public void generateTextRecord() {
         int i = Assembler.getInstance().getParser().getLC().getObjectCodeCounter();
-        int numLines = (i/30)+1;
+        int lineStart = 0;
+        int coveredBytes = 0;
         String start = extend(Integer.toHexString(PC), 6);
         text.append("^" + start.toUpperCase());
         String length = Integer.toHexString(i);
         text.append("^" + length.toUpperCase());
         int oldPC = PC;
         int bytes = 0;
-        int oldbytes;
+        int oldbytes = 0;
         for (Instruction instn : code) {
+            if (ErrorChecker.containsError(instn)) continue;
             String obj = generateObjectCode(instn);
             oldbytes = bytes;
             bytes += (PC - oldPC);
+            int oldcovered = coveredBytes;
+            coveredBytes += (PC - oldPC);
+            int olderPC = oldPC;
             oldPC = PC;
             if (bytes > 30) {
-                text.append("\nT^" + extend(Integer.toHexString(PC), 6).toUpperCase() + "^" + Integer.toHexString(i-oldbytes).toUpperCase());
-                text.replace(9,11, Integer.toHexString(oldbytes).toUpperCase());
-                bytes = 0;
-                oldbytes = 0;
+                int newLineStart = text.length()+1;
+                text.append("\nT^" + extend(Integer.toHexString(olderPC), 6).toUpperCase() + "^" + Integer.toHexString(i-oldcovered).toUpperCase());
+                text.replace(lineStart+9,lineStart+11, Integer.toHexString(oldbytes).toUpperCase());
+                bytes = PC - olderPC;
+                lineStart = newLineStart;
             }
             if (obj != null)
                 text.append("^" + obj);
         }
+       // if(bytes < 30)
+         //   text.replace(lineStart+9,lineStart+11, Integer.toHexString(bytes).toUpperCase());
+
     }
+
+
 
     public String generateObjectCode(Instruction i) {
         if (ErrorChecker.isOperation(i)) {
@@ -398,17 +411,22 @@ public class ObjectFile {
             int val = Integer.parseInt(ops[0]);
             value = Integer.toHexString(val);
             value = extend(value, 6);
+            PC += 3;
         } else {
             if (ops[0].startsWith("C")) {
+                PC += (ops[0].length() - 3);
                 ops[0] = ops[0].substring(2, ops[0].length() - 1);
                 char[] chars = ops[0].toCharArray();
                 for (int j = 0; j < chars.length; j++) {
                     value = value + extend(Integer.toHexString((int) chars[j]), 2);
                 }
             } else if (ops[0].startsWith("X")) {
+                PC += (ops[0].length() - 3) / 2;
                 ops[0] = ops[0].substring(2, ops[0].length() - 1);
                 value = ops[0];
+
             } else {
+                PC += ops.length;
                 for (int j = 0; j < ops.length; j++) {
                     int val = Integer.parseInt(ops[j]);
                     value = value + extend(Integer.toHexString(val), 2);
@@ -457,4 +475,23 @@ public class ObjectFile {
     public void setEnd(StringBuilder end) {
         this.end = end;
     }
-}
+
+    public void objectFile(){
+        try {
+            PrintWriter writer = new PrintWriter("object_file.txt", "UTF-8");
+            PrintWriter error = new PrintWriter("error_file.txt", "UTF-8");
+            writer.println(header);
+            writer.println(text);
+            writer.println(end);
+            writer.close();
+            code.forEach((i) -> {
+                if(i.getError() != null)
+                    error.println(i.getError() + " at address " + addresses.get(code.indexOf(i)).toUpperCase());
+            });
+            error.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    }

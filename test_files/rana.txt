@@ -1,0 +1,13 @@
+prog     start   0000
+bgn      lds     #3
+         ldt     #24
+         ldx     #0
+loop     lda     u,x
+         sta     v,x
+         addr    s,x
+         compr   x,t
+         jlt     *-10
+         j       *
+u        word    1
+v        resw    8
+         end     bgn

@@ -50,7 +50,7 @@ public class Parser {
     public void parseLine(String line){
 
         if (line.startsWith(".")){
-            code.add(new Instruction(line));
+            return;
         }
 
         if(line.length() < 2)
@@ -58,8 +58,8 @@ public class Parser {
 
         line = extend(line);
         String label = line.substring(0,8);
-        String mnemonic = line.substring(9, 16);
-        String operands = line.substring(17, 36);
+        String mnemonic = line.substring(9, 14);
+        String operands = line.substring(15, 36);
         String comment = line.substring(36);
         label = label.replaceAll("\\s", "");
         mnemonic = mnemonic.replaceAll("\\s", "");

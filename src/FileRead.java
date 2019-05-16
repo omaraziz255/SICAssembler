@@ -24,7 +24,7 @@ public class FileRead {
             String line;
             ArrayList<String> lines = new ArrayList<>();
             while ((line = file.readLine()) != null) {
-                lines.add(line);
+                lines.add(line.toUpperCase());
             }
             return lines;
         } catch (IOException e) {

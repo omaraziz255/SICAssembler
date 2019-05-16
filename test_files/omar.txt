@@ -1,0 +1,12 @@
+prog     start   0000
+bgn      ldt     #11   
+         ldx     #0
+loop     ldch    str1,x
+         stch    str2,x
+         tixr    t
+         jlt     loop
+         ldx     #0
+         j       *
+str1     byte    c'test string'  
+str2     resb    11
+         end     bgn

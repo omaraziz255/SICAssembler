@@ -42,7 +42,7 @@ public class Assembler {
     }
 
     public static void Pass1() {
-        FileRead f = new FileRead("test_files/src.txt");
+        FileRead f = new FileRead("test_files/hana.txt");
         ArrayList<String> file = f.loadFile();
         Cache.load();
         Assembler a = Assembler.getInstance();
@@ -56,9 +56,8 @@ public class Assembler {
         a.object.generateHeadRecord();
         a.object.generateTextRecord();
         a.object.generateEndRecord();
-        System.out.println(a.object.getHeader());
-        System.out.println(a.object.getText());
-        System.out.println(a.object.getEnd());
+        a.object.objectFile();
+        System.out.println("Pass 2 successfully completed");
 
     }
 }

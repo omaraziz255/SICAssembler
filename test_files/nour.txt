@@ -1,0 +1,16 @@
+.12345455
+prog     start   0000
+bgn      LDA     Y
+         COMP    #6
+         JGT     ELSE
+         LDA     #5
+         MUL     Y
+         STA     E
+         J       OUT
+ELSE     LDA     Y
+         ADD     #10
+         STA     E
+OUT                           j                            OUT
+Y        WORD    4
+E        RESW    1
+         END     BGN

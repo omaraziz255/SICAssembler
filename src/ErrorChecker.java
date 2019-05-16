@@ -5,7 +5,7 @@ public class ErrorChecker {
 
         if(isDirective(i))
             i= checkDirectiveError(i);
-        else if(isOperation(i))
+        else if(isOperation(i.getMnemonic()) || isOperation(i.getMnemonic().substring(1)))
             i= checkOpError(i);
         else
             i.setError("Error: Operation/Directive does not exist");
@@ -27,7 +27,7 @@ public class ErrorChecker {
     }
 
     public static Instruction checkOpError(Instruction i){
-        if(!Cache.optable.containsKey(i.getMnemonic().substring(1)) && i.getMnemonic().startsWith("*")) {
+        if(!Cache.optable.containsKey(i.getMnemonic()) && i.getMnemonic().startsWith("+")) {
             i.setError("Error: Instruction is not valid for Format 4");
             return i;
         }
@@ -63,11 +63,50 @@ public class ErrorChecker {
         return Cache.optable.containsKey(i.getMnemonic());
     }
 
+    public static boolean isOperation(String m){
+        return Cache.optable.containsKey(m);
+    }
+
     public static boolean isDirective(Instruction i){
         return Cache.dirtable.containsKey(i.getMnemonic());
     }
 
+    public static boolean containsError(Instruction i) {
+        //i = ErrorChecker.SecondPassError(i);
+        return i.getError() != null ;}
+
     public static Instruction SecondPassError(Instruction i){
+        if(i.getError() != null || !isOperation(i)) return i;
+        int format = Cache.optable.get(i.getMnemonic()).getFormat();
+        if( format == 3 || format == 4){
+            if(isLabel(i.getOperands()[0]) && !Cache.symtable.containsKey(i.getOperands()[0]))
+                i.setError("Error: This Label is not defined");
+        }
         return i;
+    }
+
+    public static boolean isLabel(String op){
+        if (isSimpleExpression(op) && op.startsWith("*")) return false;
+        else
+        if (op.startsWith("*") || op.startsWith("#") || op.startsWith("@") ) return !isNumber(op.substring(1));
+        return true;
+    }
+
+    public static boolean isSimpleExpression(String ops){
+        if(ops.contains("+") || ops.contains("-") || ops.contains("/") || ops.contains("*"))
+            return true;
+        return false;
+    }
+
+    public static boolean isNumber(String num) {
+        boolean n = true;
+        if(num.startsWith("#") || num.startsWith("@"))
+            num = num.substring(1);
+        try {
+            Integer.parseInt(num);
+        } catch (Exception e) {
+            n = false;
+        }
+        return n;
     }
 }

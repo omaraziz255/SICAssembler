@@ -1,6 +1,6 @@
-PROG     START   0000
+PROG     START   0100
          LDX     #0
-         LDT     #4
+         LDT     #7
          LDS     #1
          LDA     #0
 LOOP     LDCH    STR,X
@@ -14,10 +14,8 @@ FOUND    LDA     #STR
          ADDR    X,A
          J       DONE
 NOT      LDA     TEST
-DONE     +J      *
-STR      BYTE    C'textfile'
-TARGET   BYTE    X'000078'
+DONE     J       *
+STR      BYTE    C'Asmaa'
+TARGET   BYTE    X'00006D'
 TEST     BYTE    X'FFFFFF'
-TEST2    RESW    3
-TEST2    RESB    1
          END

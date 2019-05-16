@@ -1,24 +1,45 @@
-0000 PROG START 0000 
-0000  LDX #0 
-0003  LDT #4 
-0006  LDS #1 
-0009  LDA #0 
-000C LOOP LDCH STR 
-000F  COMP TARGET 
-0012  JEQ FOUND 
-0015  ADDR S 
-0017  COMPR X 
-0019  JLT LOOP 
-001C  J NOT 
-001F FOUND LDA #STR 
-0022  ADDR X 
-0024  J DONE 
-0027 NOT LDA TEST 
-002A DONE +J * 
-002E STR BYTE C'textfile' 
-0036 TARGET BYTE X'000078' 
-0039 TEST BYTE X'FFFFFF' 
-003C TEST2 RESW 3 
-0045 TEST2 RESB 1 
-******************* Error: Duplicate Labels ************************
-0046  END  
+1000 PROG START 1000 
+1000  LDA #0 
+1003  STA COUNT 
+1006  LDX #0 
+1009 INPUT TD INDEV 
+******************* Error: Operation/Directive does not exist ************************
+1009  JEQ INPUT 
+100C  LDA #0 
+100F  RD INDEV 
+******************* Error: Operation/Directive does not exist ************************
+100F  COMP EOF 
+1012  JEQ REV 
+1015  STCH STR 
+1018  LDA COUNT 
+101B  ADD #1 
+101E  STA COUNT 
+1021  LDX COUNT 
+1024  J INPUT 
+1027 REV LDA COUNT 
+102A  COMP #0 
+102D  JEQ DONE 
+1030  LDA COUNT 
+1033  SUB #1 
+1036  STA COUNT 
+1039  LDX COUNT 
+103C OUTPUT TD OUTDEV 
+******************* Error: Operation/Directive does not exist ************************
+103C  JEQ OUTPUT 
+103F  LDCH STR 
+1042  WD OUTDEV 
+******************* Error: Operation/Directive does not exist ************************
+1042  LDA COUNT 
+1045  SUB #1 
+1048  COMP #0 
+104B  JLT DONE 
+104E  STA COUNT 
+1051  LDX COUNT 
+1054  J OUTPUT 
+1057 DONE J * 
+105A OUTDEV BYTE X'05' 
+105B INDEV BYTE X'F3' 
+105C STR RESB 100 
+10C0 COUNT RESW 1 
+10C3 EOF BYTE X'000004' 
+10C6  END  
